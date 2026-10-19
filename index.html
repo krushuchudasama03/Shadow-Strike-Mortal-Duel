@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>SHADOW STRIKE: MORTAL DUEL</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for Fighting Aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Teko:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Main Combat Canvas -->
+        <canvas id="game-canvas"></canvas>
+
+        <!-- Top Utility Controls (Audio & Fullscreen) -->
+        <div id="top-bar-controls">
+            <button id="btn-sound-toggle" class="icon-btn" title="Toggle Sound">🔊</button>
+            <button id="btn-fullscreen" class="icon-btn" title="Fullscreen">⛶</button>
+        </div>
+
+        <!-- SCREEN 1: TITLE / START SCREEN -->
+        <div id="screen-title" class="screen-overlay">
+            <div class="title-content">
+                <div class="logo-badge">SHADOW FIGHT REALM</div>
+                <h1 class="game-logo">SHADOW<br><span class="highlight">STRIKE</span></h1>
+                <p class="tagline">MORTAL DUEL • THE SHADOW AWAKENING</p>
+                <div class="title-warrior-silhouette">🥋</div>
+                <button id="btn-title-start" class="btn-primary pulse">ENTER THE ARENA</button>
+                <div class="desktop-hint">📱 Mobile Touch Ready • 💻 Keyboard (A/D/W/S + J/K/L/U/I/Space)</div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: CHARACTER SELECT SCREEN -->
+        <div id="screen-select" class="screen-overlay hidden">
+            <div class="select-header">
+                <h2>CHOOSE YOUR WARRIOR</h2>
+                <div class="match-settings">
+                    <label>Opponent:
+                        <select id="cpu-select-dropdown" class="select-input"></select>
+                    </label>
+                    <label>Arena:
+                        <select id="arena-select-dropdown" class="select-input">
+                            <option value="0">Blood Moon Shrine</option>
+                            <option value="1">Cyber Neon Dojo</option>
+                            <option value="2">Nether Magma Pit</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <div class="select-body">
+                <!-- Roster Grid -->
+                <div id="roster-grid" class="roster-container">
+                    <!-- Injected via JavaScript -->
+                </div>
+
+                <!-- Selected Fighter Dossier / Powers Preview -->
+                <div id="fighter-preview" class="fighter-dossier">
+                    <div class="dossier-header">
+                        <div id="preview-name" class="dossier-name">KAGE</div>
+                        <div id="preview-title" class="dossier-title">Shadow Shinobi</div>
+                        <div id="preview-weapon" class="dossier-weapon">Twin Shadow Katanas</div>
+                    </div>
+
+                    <p id="preview-bio" class="dossier-bio"></p>
+
+                    <!-- Stats Bars -->
+                    <div class="stats-group">
+                        <div class="stat-row">
+                            <span>HEALTH</span>
+                            <div class="stat-bar"><div id="stat-hp" class="stat-fill"></div></div>
+                        </div>
+                        <div class="stat-row">
+                            <span>POWER</span>
+                            <div class="stat-bar"><div id="stat-power" class="stat-fill"></div></div>
+                        </div>
+                        <div class="stat-row">
+                            <span>SPEED</span>
+                            <div class="stat-bar"><div id="stat-speed" class="stat-fill"></div></div>
+                        </div>
+                        <div class="stat-row">
+                            <span>DEFENSE</span>
+                            <div class="stat-bar"><div id="stat-def" class="stat-fill"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- Special Powers Description -->
+                    <div class="powers-summary">
+                        <div class="power-item" id="sp1-desc"></div>
+                        <div class="power-item" id="sp2-desc"></div>
+                        <div class="power-item ult-item" id="ult-desc"></div>
+                    </div>
+
+                    <button id="btn-start-fight" class="btn-primary fight-start-btn">FIGHT!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: VS MATCHUP SCREEN -->
+        <div id="screen-vs" class="screen-overlay hidden">
+            <div class="vs-container">
+                <div class="vs-fighter p1-side">
+                    <div id="vs-p1-avatar" class="vs-avatar">🥷</div>
+                    <div id="vs-p1-name" class="vs-name">KAGE</div>
+                    <div class="vs-sub">PLAYER 1</div>
+                </div>
+                <div class="vs-emblem">
+                    <div class="vs-text">VS</div>
+                </div>
+                <div class="vs-fighter p2-side">
+                    <div id="vs-p2-avatar" class="vs-avatar">🔥</div>
+                    <div id="vs-p2-name" class="vs-name">IGNIS</div>
+                    <div class="vs-sub">CPU BOSS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: IN-GAME HUD & TOUCH CONTROLS OVERLAY -->
+        <div id="hud-overlay" class="screen-overlay pointer-events-none hidden">
+            <!-- Top Health & Super Bars -->
+            <div class="hud-top">
+                <!-- Player 1 Healthbar -->
+                <div class="fighter-hud p1-hud">
+                    <div class="hud-meta">
+                        <div id="hud-p1-avatar" class="hud-avatar">🥷</div>
+                        <div class="hud-name-wrapper">
+                            <span id="hud-p1-name" class="hud-fighter-name">KAGE</span>
+                            <div id="p1-wins" class="win-markers">
+                                <span class="win-dot"></span>
+                                <span class="win-dot"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hp-bar-outer">
+                        <div id="hud-p1-hp-lag" class="hp-bar-lag"></div>
+                        <div id="hud-p1-hp-fill" class="hp-bar-fill"></div>
+                    </div>
+                    <!-- Super / Ultimate Meter -->
+                    <div class="super-bar-outer">
+                        <div id="hud-p1-super-fill" class="super-bar-fill"></div>
+                        <span class="super-label">SUPER METER</span>
+                    </div>
+                </div>
+
+                <!-- Round Timer -->
+                <div class="timer-wrapper">
+                    <div id="round-timer">99</div>
+                </div>
+
+                <!-- Player 2 (CPU) Healthbar -->
+                <div class="fighter-hud p2-hud">
+                    <div class="hud-meta reverse">
+                        <div id="hud-p2-avatar" class="hud-avatar">🔥</div>
+                        <div class="hud-name-wrapper reverse">
+                            <span id="hud-p2-name" class="hud-fighter-name">IGNIS</span>
+                            <div id="p2-wins" class="win-markers">
+                                <span class="win-dot"></span>
+                                <span class="win-dot"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hp-bar-outer">
+                        <div id="hud-p2-hp-lag" class="hp-bar-lag"></div>
+                        <div id="hud-p2-hp-fill" class="hp-bar-fill"></div>
+                    </div>
+                    <div class="super-bar-outer">
+                        <div class="super-bar-fill cpu-super"></div>
+                        <span class="super-label">CPU POWER</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Combo Streak Banner -->
+            <div id="hud-combo-counter" class="combo-text"></div>
+
+            <!-- Mobile Touch Virtual Controls Overlay -->
+            <div id="touch-controls" class="touch-controls-container pointer-events-auto">
+                <!-- Left Directional D-Pad -->
+                <div class="dpad-container">
+                    <button id="btn-up" class="dpad-btn up" aria-label="Jump">▲</button>
+                    <div class="dpad-horizontal">
+                        <button id="btn-left" class="dpad-btn left" aria-label="Move Left">◀</button>
+                        <button id="btn-down" class="dpad-btn down" aria-label="Crouch">▼</button>
+                        <button id="btn-right" class="dpad-btn right" aria-label="Move Right">▶</button>
+                    </div>
+                </div>
+
+                <!-- Right Action Cluster -->
+                <div class="actions-container">
+                    <div class="action-row special-row">
+                        <button id="btn-sp1" class="action-btn sp-btn" aria-label="Special 1">
+                            <span id="sp1-name-tag">⚡</span>
+                            <span class="btn-subtext">SP 1</span>
+                        </button>
+                        <button id="btn-sp2" class="action-btn sp-btn" aria-label="Special 2">
+                            <span id="sp2-name-tag">🔥</span>
+                            <span class="btn-subtext">SP 2</span>
+                        </button>
+                        <button id="btn-super" class="action-btn super-btn" aria-label="Ultimate">
+                            <span>☠️</span>
+                            <span class="btn-subtext">ULTIMATE</span>
+                        </button>
+                    </div>
+                    <div class="action-row basic-row">
+                        <button id="btn-block" class="action-btn def-btn" aria-label="Block">
+                            <span>🛡️</span>
+                            <span class="btn-subtext">BLOCK</span>
+                        </button>
+                        <button id="btn-punch" class="action-btn atk-btn punch-btn" aria-label="Punch">
+                            <span>👊</span>
+                            <span class="btn-subtext">PUNCH</span>
+                        </button>
+                        <button id="btn-kick" class="action-btn atk-btn kick-btn" aria-label="Kick">
+                            <span>🦵</span>
+                            <span class="btn-subtext">KICK</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: GAME OVER / VICTORY SCREEN -->
+        <div id="screen-gameover" class="screen-overlay hidden">
+            <div class="gameover-box">
+                <h1 id="gameover-title" class="gameover-title">VICTORY</h1>
+                <p id="gameover-sub" class="gameover-sub">FATALITY! CHAMPION OF SHADOWS</p>
+                <div class="gameover-actions">
+                    <button id="btn-rematch" class="btn-primary">REMATCH</button>
+                    <button id="btn-back-select" class="btn-secondary">SELECT WARRIOR</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Landscape Orientation Notice -->
+        <div id="orientation-warning">
+            <div class="rotate-icon">📱 ➔ 🔄</div>
+            <h3>LANDSCAPE RECOMMENDED</h3>
+            <p>Please rotate your phone to landscape mode for the best fighting game experience.</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="characters.js"></script>
+    <script src="audio.js"></script>
+    <script src="particles.js"></script>
+    <script src="fighter.js"></script>
+    <script src="ai.js"></script>
+    <script src="controls.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
